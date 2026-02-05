@@ -4,8 +4,7 @@ import { build } from "./index.js";
 
 const program = new Command();
 
-program
-    .name("ts-cmacro")
+program.name("ts-cmacro")
     .version("1.0.0")
     .argument("<entry>", "Entry TypeScript file")
     .option("-o, --output <file>", "Output file path")

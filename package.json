@@ -1,5 +1,5 @@
 {
-  "name": "ts-cmacro",
+  "name": "@qzlin/ts-cmacro",
   "version": "1.0.0",
   "description": "Type-checked macro-expanded scripting for hostile JavaScript runtimes - flatten TypeScript modules into a single file",
   "author": "QZLin <qzlin01@163.com>",

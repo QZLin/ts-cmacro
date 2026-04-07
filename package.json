@@ -1,26 +1,69 @@
 {
   "name": "ts-cmacro",
   "version": "1.0.0",
-  "description": "",
+  "description": "Type-checked macro-expanded scripting for hostile JavaScript runtimes - flatten TypeScript modules into a single file",
+  "author": "QZLin <qzlin01@163.com>",
   "type": "module",
   "bin": {
     "ts-cmacro": "dist/cli.js"
   },
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "clean": "rimraf dist",
+    "prebuild": "npm run clean",
+    "lint": "eslint src --ext .ts",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "prepare": "npm run build",
+    "test": "node --test",
+    "test:coverage": "c8 npm test",
+    "prepublishOnly": "npm run build"
   },
-  "keywords": [],
-  "author": "",
-  "license": "",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./cli": {
+      "types": "./dist/cli.d.ts",
+      "import": "./dist/cli.js"
+    }
+  },
+  "keywords": [
+    "typescript",
+    "macro",
+    "bundler",
+    "embedded-javascript",
+    "flat-bundle"
+  ],
+  "license": "GPL-3.0",
   "packageManager": "pnpm@10.26.1",
   "dependencies": {
     "commander": "^14.0.2",
-    "ts-cmacro": "link:",
     "typescript": "^5.9.3"
   },
   "devDependencies": {
     "@types/node": "^25.0.8",
     "ts-node": "^10.9.2",
+    "rimraf": "^6.1.3",
     "undici-types": "^7.18.2"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/QZLin/ts-cmacro.git"
+  },
+  "bugs": {
+    "url": "https://github.com/QZLin/ts-cmacro/issues"
+  },
+  "homepage": "https://github.com/QZLin/ts-cmacro#readme",
+  "files": [
+    "dist/**/*.js",
+    "dist/**/*.d.ts",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "types": "dist/index.d.ts"
 }

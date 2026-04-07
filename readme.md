@@ -1,8 +1,8 @@
-# ts-macro-script
+# ts-cmacro
 
 > **Type-checked macro-expanded scripting for hostile JavaScript runtimes**
 
-`ts-macro-script` lets you write large, maintainable scripts in **TypeScript**—with full type checking, IntelliSense, and modular structure—then **compile them into a single, flat, top‑level JavaScript file** that runs in environments which **do not support modules, bundlers, IIFE wrappers, or modern JS semantics**.
+`ts-cmacro` lets you write large, maintainable scripts in **TypeScript**—with full type checking, IntelliSense, and modular structure—then **compile them into a single, flat, top‑level TypeScript file** that can be further transpiled to JavaScript for environments which **do not support modules, bundlers, IIFE wrappers, or modern JS semantics**.
 
 If your runtime only understands:
 
@@ -11,6 +11,53 @@ function main(config) { /* ... */ }
 ```
 
 …but you want to author your script like a real project, this tool is for you.
+
+---
+
+## Installation
+
+```bash
+# Install globally
+npm install -g ts-cmacro
+# or
+pnpm add -g ts-cmacro
+
+# Install as dev dependency
+npm install -D ts-cmacro
+# or
+pnpm add -D ts-cmacro
+```
+
+## Usage
+
+### CLI
+
+```bash
+# Basic usage (outputs TypeScript)
+ts-cmacro src/main.ts -o dist/script.ts
+
+# Compact output (remove unnecessary whitespace)
+ts-cmacro src/main.ts -o dist/script.ts -c
+
+# Output to stdout
+ts-cmacro src/main.ts
+
+# Show help
+ts-cmacro --help
+```
+
+### Programmatic API
+
+```typescript
+import { build } from 'ts-cmacro';
+
+const code = build({
+  entry: './src/main.ts',
+  compact: true
+});
+
+console.log(code);
+```
 
 ---
 
@@ -51,7 +98,7 @@ The only stable contract is:
 * `import` is for **humans and tooling**, not the runtime
 * The **global scope is the linker**
 * All complexity is resolved at **build time**
-* The runtime receives **flat, boring, predictable JavaScript**
+* The runtime receives **flat, boring, predictable JavaScript** (after transpilation)
 
 Think:
 
@@ -77,26 +124,38 @@ function main(config: ClashConfig) {
 }
 ```
 
-`ts-macro-script` will:
+`ts-cmacro` will:
 
 1. Parse the TypeScript program using the TypeScript Compiler API
 2. Resolve `import` dependencies (relative paths only)
 3. Topologically sort source files
 4. **Remove all `import` and `export` syntax**
 5. Concatenate declarations into a single output file
-6. Optionally downlevel syntax (e.g. ES2019)
 
-Resulting JavaScript:
+Resulting TypeScript:
 
-```js
-function buildRules(old) {
+```ts
+function buildRules(old: string[]) {
   return ["DOMAIN-SUFFIX,baidu.com,DIRECT", ...old];
 }
 
-function main(config) {
+function main(config: ClashConfig) {
   config.rules = buildRules(config.rules ?? []);
   return config;
 }
+```
+
+Then transpile to JavaScript using your preferred tool:
+
+```bash
+# Using tsc
+tsc dist/script.ts --outFile dist/script.js --target ES2018
+
+# Using esbuild
+esbuild dist/script.ts --outfile=dist/script.js --target=es2018
+
+# Using swc
+swc dist/script.ts -o dist/script.js
 ```
 
 No wrappers. No modules. No runtime helpers.
@@ -149,11 +208,19 @@ src/
 
         ↓
 
-pnpm ts-macro build src/main.ts
+ts-cmacro src/main.ts -o dist/script.ts
 
         ↓
 
-dist/script.js   ← flat, top-level JS
+dist/script.ts   ← flat, top-level TypeScript
+
+        ↓
+
+tsc dist/script.ts --outFile dist/script.js
+
+        ↓
+
+dist/script.js   ← flat, top-level JavaScript
 ```
 
 You keep full IDE support:
